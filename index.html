@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Zoomy Vehicles Twins - A fun matching game for toddlers featuring colorful trucks!">
+  <meta property="og:title" content="Zoomy Vehicles Twins - Built with ChatAndBuild">
+  <meta property="og:description" content="A fun matching game for toddlers featuring colorful trucks!">
+  <meta property="og:image" content="https://cdn.chatandbuild.com/images/preview.png">
+  <meta property="keywords" content="no-code, app builder, conversation-driven development, kids game, phaser game">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Zoomy Vehicles Twins - Built with ChatAndBuild">
+  <meta property="twitter:description" content="A fun matching game for toddlers featuring colorful trucks!">
+  <meta property="twitter:image" content="https://cdn.chatandbuild.com/images/preview.png">
+  <meta property="twitter:site" content="@chatandbuild">
+  <title>Zoomy Vehicles Twins!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Courier New', monospace;
+      background: #00F0FF;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    #game-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #00F0FF;
+    }
+    
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      font-weight: bold;
+      color: #000000;
+      text-shadow: 4px 4px 0 #FF005C;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div class="loading">LOADING TRUCKS...</div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
