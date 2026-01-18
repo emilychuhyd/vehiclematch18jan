@@ -5,18 +5,46 @@ export class Truck extends Phaser.GameObjects.Container {
   public data: TruckData;
   private graphics: Phaser.GameObjects.Graphics;
   private baseScale: number;
+  private highlightGraphics: Phaser.GameObjects.Graphics;
   
   constructor(scene: Phaser.Scene, x: number, y: number, data: TruckData) {
     super(scene, x, y);
     this.data = data;
     this.baseScale = data.scale;
     
+    this.highlightGraphics = scene.add.graphics();
+    this.add(this.highlightGraphics);
+    
     this.graphics = scene.add.graphics();
     this.add(this.graphics);
     
     this.drawTruck();
-    this.setSize(200, 150);
-    this.setInteractive(new Phaser.Geom.Rectangle(-100, -75, 200, 150), Phaser.Geom.Rectangle.Contains);
+    
+    const hitAreaSize = 280;
+    this.setSize(hitAreaSize, hitAreaSize);
+    this.setInteractive(
+      new Phaser.Geom.Rectangle(-hitAreaSize / 2, -hitAreaSize / 2, hitAreaSize, hitAreaSize),
+      Phaser.Geom.Rectangle.Contains
+    );
+    
+    this.on('pointerover', () => {
+      scene.tweens.add({
+        targets: this,
+        scaleX: 1.05,
+        scaleY: 1.05,
+        duration: 100
+      });
+    });
+    
+    this.on('pointerout', () => {
+      if (this.scaleX > 1.2) return;
+      scene.tweens.add({
+        targets: this,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 100
+      });
+    });
     
     scene.add.existing(this);
   }
@@ -125,6 +153,10 @@ export class Truck extends Phaser.GameObjects.Container {
   }
   
   public highlight(): void {
+    this.highlightGraphics.clear();
+    this.highlightGraphics.lineStyle(8, 0xFFFF00);
+    this.highlightGraphics.strokeCircle(0, 0, 140);
+    
     this.scene.tweens.add({
       targets: this,
       scaleX: 1.3,
@@ -145,6 +177,8 @@ export class Truck extends Phaser.GameObjects.Container {
   }
   
   public unhighlight(): void {
+    this.highlightGraphics.clear();
+    
     this.scene.tweens.add({
       targets: this,
       scaleX: 1,

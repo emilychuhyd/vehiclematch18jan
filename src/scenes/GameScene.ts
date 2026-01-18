@@ -60,49 +60,51 @@ export default class GameScene extends Phaser.Scene {
   }
   
   private createUI(): void {
-    const homeBtn = this.createButton(100, 100, '🏠', () => {
+    const homeBtn = this.createButton(120, 120, '🏠', () => {
       this.voiceManager.speak('Going home!');
       this.scene.start('MenuScene');
     });
     
-    const restartBtn = this.createButton(980, 100, '🔄', () => {
+    const restartBtn = this.createButton(960, 120, '🔄', () => {
       this.voiceManager.speak('Starting over!');
       this.scene.restart();
     });
     
-    this.progressText = this.add.text(540, 100, '0/0 MATCHED!', {
+    this.progressText = this.add.text(540, 120, '0/0 MATCHED!', {
       fontFamily: 'Courier New, monospace',
-      fontSize: '48px',
+      fontSize: '56px',
       color: '#000000',
       fontStyle: 'bold'
     });
     this.progressText.setOrigin(0.5);
-    this.progressText.setShadow(4, 4, '#FFFFFF', 0, false, true);
+    this.progressText.setShadow(5, 5, '#FFFFFF', 0, false, true);
   }
   
   private createButton(x: number, y: number, emoji: string, callback: () => void): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
     
-    const bg = this.add.graphics();
-    bg.fillStyle(0xFFFFFF);
-    bg.fillRect(-60, -60, 120, 120);
-    bg.lineStyle(4, 0x000000);
-    bg.strokeRect(-60, -60, 120, 120);
+    const size = 160;
     
     const shadow = this.add.graphics();
     shadow.fillStyle(0x000000);
-    shadow.fillRect(-60 + 6, -60 + 6, 120, 120);
+    shadow.fillRect(-size / 2 + 8, -size / 2 + 8, size, size);
+    
+    const bg = this.add.graphics();
+    bg.fillStyle(0xFFFFFF);
+    bg.fillRect(-size / 2, -size / 2, size, size);
+    bg.lineStyle(6, 0x000000);
+    bg.strokeRect(-size / 2, -size / 2, size, size);
     
     container.add([shadow, bg]);
     
     const text = this.add.text(0, 0, emoji, {
-      fontSize: '64px'
+      fontSize: '80px'
     });
     text.setOrigin(0.5);
     container.add(text);
     
-    container.setSize(120, 120);
-    container.setInteractive(new Phaser.Geom.Rectangle(-60, -60, 120, 120), Phaser.Geom.Rectangle.Contains);
+    container.setSize(size, size);
+    container.setInteractive(new Phaser.Geom.Rectangle(-size / 2, -size / 2, size, size), Phaser.Geom.Rectangle.Contains);
     
     container.on('pointerdown', () => {
       this.audioManager.playTap();
@@ -113,6 +115,24 @@ export default class GameScene extends Phaser.Scene {
         duration: 100,
         yoyo: true,
         onComplete: callback
+      });
+    });
+    
+    container.on('pointerover', () => {
+      this.tweens.add({
+        targets: container,
+        scaleX: 1.1,
+        scaleY: 1.1,
+        duration: 100
+      });
+    });
+    
+    container.on('pointerout', () => {
+      this.tweens.add({
+        targets: container,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 100
       });
     });
     
@@ -131,9 +151,9 @@ export default class GameScene extends Phaser.Scene {
     const rows = Math.ceil(this.truckData.length / cols);
     
     const startX = 270;
-    const startY = 400;
+    const startY = 450;
     const spacingX = 540;
-    const spacingY = 350;
+    const spacingY = 400;
     
     this.truckData.forEach((data, index) => {
       const col = index % cols;
@@ -158,7 +178,7 @@ export default class GameScene extends Phaser.Scene {
       truck.highlight();
       this.speakTruckDetails(truck, true);
     } else {
-      if (this.checkMatch(this.selectedTruck, truck)) {
+      if (this.checkExactMatch(this.selectedTruck, truck)) {
         this.handleMatch(this.selectedTruck, truck);
       } else {
         this.handleMismatch(this.selectedTruck, truck);
@@ -166,8 +186,16 @@ export default class GameScene extends Phaser.Scene {
     }
   }
   
-  private checkMatch(truck1: Truck, truck2: Truck): boolean {
-    return truck1.data.pairId === truck2.data.pairId;
+  private checkExactMatch(truck1: Truck, truck2: Truck): boolean {
+    const d1 = truck1.data;
+    const d2 = truck2.data;
+    
+    return d1.pairId === d2.pairId &&
+           d1.color === d2.color &&
+           d1.scale === d2.scale &&
+           d1.wheels === d2.wheels &&
+           d1.accessory === d2.accessory &&
+           d1.category === d2.category;
   }
   
   private handleMatch(truck1: Truck, truck2: Truck): void {
@@ -205,7 +233,7 @@ export default class GameScene extends Phaser.Scene {
     truck1.shake();
     truck2.shake();
     
-    this.voiceManager.speak('Almost! Try another!');
+    this.voiceManager.speak('Not quite! Try again!');
     
     this.time.delayedCall(500, () => {
       truck1.unhighlight();
@@ -238,19 +266,19 @@ export default class GameScene extends Phaser.Scene {
     } else {
       switch (mode) {
         case 'colors':
-          message = `Yay! Two ${truck.data.colorName} trucks!`;
+          message = `Perfect match! Two ${truck.data.colorName} trucks!`;
           break;
         case 'sizes':
-          message = `Yay! Two ${truck.data.scaleName} trucks!`;
+          message = `Perfect match! Two ${truck.data.scaleName} trucks!`;
           break;
         case 'wheels':
-          message = `Yay! Two trucks with ${truck.data.wheels} wheels!`;
+          message = `Perfect match! Two trucks with ${truck.data.wheels} wheels!`;
           break;
         case 'details':
-          message = `Yay! Two trucks with ${truck.data.accessory}!`;
+          message = `Perfect match! Two trucks with ${truck.data.accessory}!`;
           break;
         case 'where':
-          message = `Yay! Two ${truck.data.category} trucks!`;
+          message = `Perfect match! Two ${truck.data.category} trucks!`;
           break;
       }
     }
@@ -265,19 +293,19 @@ export default class GameScene extends Phaser.Scene {
   private createConfetti(x: number, y: number): void {
     const colors = [0xFF005C, 0xFFFF00, 0x00F0FF, 0x00FF00, 0xFF8800, 0x8800FF];
     
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       const confetti = this.add.graphics();
       confetti.fillStyle(colors[Math.floor(Math.random() * colors.length)]);
-      confetti.fillRect(0, 0, 10, 10);
+      confetti.fillRect(0, 0, 12, 12);
       confetti.setPosition(x, y);
       
       this.tweens.add({
         targets: confetti,
-        x: x + Phaser.Math.Between(-200, 200),
-        y: y + Phaser.Math.Between(-200, 200),
+        x: x + Phaser.Math.Between(-250, 250),
+        y: y + Phaser.Math.Between(-250, 250),
         alpha: 0,
         rotation: Phaser.Math.Between(0, 360),
-        duration: 1000,
+        duration: 1200,
         ease: 'Cubic.easeOut',
         onComplete: () => confetti.destroy()
       });
@@ -294,6 +322,30 @@ export default class GameScene extends Phaser.Scene {
     );
     StorageManager.save(this.gameState);
     
-    this.scene.start('WinScene', { stars });
+    this.time.delayedCall(2000, () => {
+      this.advanceToNextGame();
+    });
+  }
+  
+  private advanceToNextGame(): void {
+    const modes: Array<keyof typeof this.gameState.stars> = ['colors', 'sizes', 'wheels', 'details', 'where'];
+    const difficulties: Array<'easy' | 'medium' | 'hard'> = ['easy', 'medium', 'hard'];
+    
+    const currentModeIndex = modes.indexOf(this.gameState.mode);
+    const currentDiffIndex = difficulties.indexOf(this.gameState.difficulty);
+    
+    if (currentDiffIndex < difficulties.length - 1) {
+      this.gameState.difficulty = difficulties[currentDiffIndex + 1];
+    } else if (currentModeIndex < modes.length - 1) {
+      this.gameState.mode = modes[currentModeIndex + 1];
+      this.gameState.difficulty = 'easy';
+    } else {
+      this.gameState.mode = 'colors';
+      this.gameState.difficulty = 'easy';
+    }
+    
+    StorageManager.save(this.gameState);
+    this.voiceManager.speak('Next challenge!');
+    this.scene.restart();
   }
 }

@@ -1,18 +1,15 @@
 export type GameMode = 'colors' | 'sizes' | 'wheels' | 'details' | 'where';
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type Category = 'land' | 'sky' | 'sea';
-export type Accessory = 'ladder' | 'siren' | 'trailer' | 'none';
 
 export interface TruckData {
-  id: number;
+  pairId: number;
   color: number;
   colorName: string;
   scale: number;
   scaleName: string;
   wheels: number;
-  accessory: Accessory;
-  category: Category;
-  pairId: number;
+  accessory: 'ladder' | 'siren' | 'trailer';
+  category: 'land' | 'sky' | 'sea';
 }
 
 export interface GameState {
@@ -25,8 +22,4 @@ export interface GameState {
     details: { easy: number; medium: number; hard: number };
     where: { easy: number; medium: number; hard: number };
   };
-  soundEnabled: boolean;
-  voiceEnabled: boolean;
-  language: 'en' | 'zh';
-  volume: number;
 }

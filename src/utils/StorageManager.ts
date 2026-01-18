@@ -1,27 +1,30 @@
 import { GameState } from '../types';
 
 export class StorageManager {
-  private static KEY = 'zoomy-vehicles-state';
-  
-  static save(state: GameState): void {
+  private static STORAGE_KEY = 'zoomy-vehicles-game-state';
+
+  public static save(state: GameState): void {
     try {
-      localStorage.setItem(this.KEY, JSON.stringify(state));
-    } catch (e) {
-      console.warn('Failed to save state:', e);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Failed to save game state:', error);
     }
   }
-  
-  static load(): GameState | null {
+
+  public static load(): GameState {
     try {
-      const data = localStorage.getItem(this.KEY);
-      return data ? JSON.parse(data) : null;
-    } catch (e) {
-      console.warn('Failed to load state:', e);
-      return null;
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Failed to load game state:', error);
     }
+
+    return this.getDefaultState();
   }
-  
-  static getDefaultState(): GameState {
+
+  private static getDefaultState(): GameState {
     return {
       mode: 'colors',
       difficulty: 'easy',
@@ -31,11 +34,11 @@ export class StorageManager {
         wheels: { easy: 0, medium: 0, hard: 0 },
         details: { easy: 0, medium: 0, hard: 0 },
         where: { easy: 0, medium: 0, hard: 0 }
-      },
-      soundEnabled: true,
-      voiceEnabled: true,
-      language: 'en',
-      volume: 0.5
+      }
     };
+  }
+
+  public static reset(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
   }
 }

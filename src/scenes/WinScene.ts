@@ -129,24 +129,24 @@ export default class WinScene extends Phaser.Scene {
   private createButton(x: number, y: number, text: string, color: number, callback: () => void): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
     
-    const width = 600;
-    const height = 140;
+    const width = 700;
+    const height = 160;
+    
+    const shadow = this.add.graphics();
+    shadow.fillStyle(0x000000);
+    shadow.fillRect(-width / 2 + 10, -height / 2 + 10, width, height);
     
     const bg = this.add.graphics();
     bg.fillStyle(color);
     bg.fillRect(-width / 2, -height / 2, width, height);
-    bg.lineStyle(4, 0x000000);
+    bg.lineStyle(8, 0x000000);
     bg.strokeRect(-width / 2, -height / 2, width, height);
-    
-    const shadow = this.add.graphics();
-    shadow.fillStyle(0x000000);
-    shadow.fillRect(-width / 2 + 8, -height / 2 + 8, width, height);
     
     container.add([shadow, bg]);
     
     const label = this.add.text(0, 0, text, {
       fontFamily: 'Courier New, monospace',
-      fontSize: '56px',
+      fontSize: '64px',
       color: '#000000',
       fontStyle: 'bold'
     });
@@ -164,6 +164,24 @@ export default class WinScene extends Phaser.Scene {
         duration: 100,
         yoyo: true,
         onComplete: callback
+      });
+    });
+    
+    container.on('pointerover', () => {
+      this.tweens.add({
+        targets: container,
+        scaleX: 1.05,
+        scaleY: 1.05,
+        duration: 100
+      });
+    });
+    
+    container.on('pointerout', () => {
+      this.tweens.add({
+        targets: container,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 100
       });
     });
     
